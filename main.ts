@@ -11,5 +11,12 @@ import { mkdirSync, writeFileSync } from "node:fs";
 const LINE =
   "My agent has read every book ever written and still opens every reply with 'Great question!'";
 
+// Guard the sealed scorer's gate (1-200 UTF-8 chars, one line, not blank)
+// before writing, so a bad line fails loudly here instead of scoring 0.
+const chars = [...LINE];
+if (chars.length < 1 || chars.length > 200 || LINE.includes("\n") || LINE.trim() === "") {
+  throw new Error(`entry line fails the 1-200 char single-line gate (${chars.length} chars)`);
+}
+
 mkdirSync("/output", { recursive: true });
 writeFileSync("/output/entry.txt", LINE, "utf8");
